@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Full Page Example</title>
+    <style>
+        /* Apply CSS styles to make the content fill the entire viewport */
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            display: flex;
+        }
+
+        #fullpage {
+            width: 100%;
+            height: 100%;
+            display: block;
+            align-items: center;
+            justify-content: center;
+            background-color: #f0f0f0;
+        }
+
+        #fullpage>* {
+            display: block;
+            font-size: 36px;
+            text-align: center;
+        }
+
+        /* #fullpage h2 {
+            display: block;
+            font-size: 36px;
+            text-align: center;
+        } */
+    </style>
+</head>
+
+<body>
+    <div id="fullpage">
+        <input id="inputText" type="text">
+        <input id="button" value="send Data to server">
+        <h1>Hello, World!</h1>
+        <h2 id="message-container">
+        </h2>
+
+    </div>
+    <script>
+        const socket = new WebSocket('ws://127.0.0.1:12344');
+
+        // Event handler for when the connection is established.
+        socket.addEventListener('open', (event) => {
+            console.log('WebSocket connection opened:', event);
+
+            // Send a message to the server (optional).
+            socket.send('Hello, server!');
+        });
+
+        // Event handler for incoming messages from the server.
+        socket.addEventListener('message', (event) => {
+            console.log('Message received from server:', event.data);
+
+            // You can process the received message here or update the DOM.
+            // For example, display the message on a webpage.
+            const messageContainer = document.getElementById('message-container');
+            messageContainer.innerHTML = `Received: ${event.data}`;
+        });
+
+        // Event handler for when the connection is closed.
+        socket.addEventListener('close', (event) => {
+            if (event.wasClean) {
+                console.log('WebSocket connection closed cleanly:', event.reason);
+            } else {
+                console.error('WebSocket connection abruptly closed:', event);
+            }
+        });
+
+        // Event handler for WebSocket errors.
+        socket.addEventListener('error', (error) => {
+            console.error('WebSocket error:', error);
+        });
+
+        const button = document.getElementById('button');
+        const inputText = document.getElementById('inputText');
+
+        button.addEventListener('click', function (e) {
+            e.preventDefault();
+            const textToSend = inputText.value;
+            console.log('Sending:', textToSend);
+
+            // Send the message, but handle errors with onerror
+            if (socket.readyState === WebSocket.OPEN) {
+                socket.send(textToSend);
+
+                console.log('Sending:', 'should be sent');
+
+            } else {
+                console.error('WebSocket is not open for sending.');
+            }
+        });
+
+    </script>
+</body>
+
+</html>
